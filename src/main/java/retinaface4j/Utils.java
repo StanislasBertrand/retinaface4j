@@ -1,5 +1,7 @@
 package retinaface4j;
 
+import java.util.*;
+
 import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
@@ -9,6 +11,7 @@ import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.common.util.ArrayUtil;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -73,29 +76,8 @@ public final class Utils {
         return output;
     }
 
-//     public static int[] argsort(final float[] a, final boolean ascending) {
-//         Integer[] indexes = new Integer[a.length];
-//         for (int i = 0; i < indexes.length; i++) {
-//             indexes[i] = i;
-//         }
-//         Arrays.sort(indexes, new Comparator<Integer>() {
-//             @Override
-//             public int compare(final Integer i1, final Integer i2) {
-//                 return (ascending ? 1 : -1) * Float.compare(a[i1], a[i2]);
-//             }
-//         });
-//         return asArray(indexes);
-//     }
-//
-//     public static <T extends Number> int[] asArray(final T... a) {
-//         int[] b = new int[a.length];
-//         for (int i = 0; i < b.length; i++) {
-//             b[i] = a[i].intValue();
-//         }
-//         return b;
-//     }
 
-    public static int cpu_nms(INDArray dets, double thresh) {
+    public static INDArray cpu_nms(INDArray dets, double thresh) {
         INDArray x1 = dets.getColumn(0);
         INDArray y1 = dets.getColumn(1);
         INDArray x2 = dets.getColumn(2);
@@ -104,37 +86,64 @@ public final class Utils {
 
         INDArray areas = x2.sub(x1).add(1).mul(y2.sub(y1).add(1));
         INDArray order = Nd4j.reverse(Nd4j.createFromArray(ArrayUtils.argsort(scores.toFloatVector())));
-        System.out.println((order));
-        return 1;
-    }
-//     def py_cpu_nms(dets, thresh):
-//         """Pure Python NMS baseline."""
-//         x1 = dets[:, 0]
-//         y1 = dets[:, 1]
-//         x2 = dets[:, 2]
-//         y2 = dets[:, 3]
-//         scores = dets[:, 4]
-//
-//         areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-//         order = scores.argsort()[::-1]
-//
-//         keep = []
-//         while order.size > 0:
-//             i = order[0]
-//             keep.append(i)
-//             xx1 = np.maximum(x1[i], x1[order[1:]])
-//             yy1 = np.maximum(y1[i], y1[order[1:]])
-//             xx2 = np.minimum(x2[i], x2[order[1:]])
-//             yy2 = np.minimum(y2[i], y2[order[1:]])
-//
-//             w = np.maximum(0.0, xx2 - xx1 + 1)
-//             h = np.maximum(0.0, yy2 - yy1 + 1)
-//             inter = w * h
-//             ovr = inter / (areas[i] + areas[order[1:]] - inter)
-//
-//             inds = np.where(ovr <= thresh)[0]
-//             order = order[inds + 1]
-//
-//         return keep
 
+        int i = 0;
+        boolean keepon = true;
+        List<Integer> keep = new ArrayList<Integer>();
+        while (keepon){
+            i = order.getInt(0);
+            keep.add(i);
+            INDArray x1OrderInd = x1.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
+            INDArray xx1 = Transforms.max(x1OrderInd,
+                                          Nd4j.ones(x1OrderInd.shape()).mul(x1.getDouble(i)));
+            INDArray y1OrderInd = y1.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
+            INDArray yy1 = Transforms.max(y1OrderInd,
+                                          Nd4j.ones(y1OrderInd.shape()).mul(y1.getDouble(i)));
+            INDArray x2OrderInd = x2.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
+            INDArray xx2 = Transforms.min(x2OrderInd,
+                                          Nd4j.ones(x2OrderInd.shape()).mul(x2.getDouble(i)));
+
+            INDArray y2OrderInd = y2.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
+            INDArray yy2 = Transforms.min(y2OrderInd,
+                                          Nd4j.ones(y2OrderInd.shape()).mul(y2.getDouble(i)));
+
+
+            INDArray w = Transforms.max(Nd4j.zeros(xx2.shape()), xx2.sub(xx1).add(1));
+            INDArray h = Transforms.max(Nd4j.zeros(yy2.shape()), yy2.sub(yy1).add(1));
+
+            INDArray inter = w.mul(h);
+            INDArray over = inter.div(areas.get(order.get(NDArrayIndex.interval(1, order.shape()[0]))).sub(inter).add(areas.getDouble(i)));
+            List<Integer> indices = new ArrayList<Integer>();
+            for (int j =0; j<over.shape()[0]; j++){
+                if (over.getDouble(j)<=thresh){
+                    indices.add(j);
+                }
+            }
+
+            int[] indicesArr = new int[indices.size()];
+            for (int j=0; j < indicesArr.length; j++)
+            {
+                indicesArr[j] = indices.get(j).intValue();
+            }
+            INDArray nd4jInds = Nd4j.createFromArray(indicesArr);
+            if (nd4jInds.isEmpty()) {
+            keepon = false;
+            continue;
+            }
+
+            order = order.get(nd4jInds.add(1));
+            if (order.isEmpty()) {
+            keepon = false;
+            }
+
+        }
+        int[] keepArr = new int[keep.size()];
+        for (int j=0; j < keepArr.length; j++)
+        {
+            keepArr[j] = keep.get(j).intValue();
+        }
+
+        INDArray nd4jKeepArr = Nd4j.createFromArray(keepArr);
+        return nd4jKeepArr;
+    }
 }

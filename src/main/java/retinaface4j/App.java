@@ -83,8 +83,6 @@ public class App {
 
     long[] locShape = loc.shape();
     long[] priorsShape = priors.shape();
-    System.out.println(Arrays.toString(locShape));
-    System.out.println(Arrays.toString(priorsShape));
 
     INDArray boxes = Utils.decode(loc.getDataAsFloatArray(), priors.getDataAsFloatArray(), locShape);
     long[] shape = {wr.getWidth(), wr.getHeight(), wr.getWidth(), wr.getHeight()};
@@ -121,26 +119,40 @@ public class App {
     INDArray thresholdedBoxes = boxes2.get(nd4jInds);
     INDArray thresholdedLandnms = landnms2.get(nd4jInds);
 
-
     // keep top-K before NMS TO CHECK VALUES AGAINS AND KEEP GOING WITH BOXES3 ETC.
-    INDArray order = Nd4j.reverse(Nd4j.createFromArray(ArrayUtils.argsort(thresholdedScrores.toFloatVector())));
-    int maxInd = 750;
-    if (order.shape()[0] < maxInd){
-        maxInd = (int) order.shape()[0];
-    }
-    INDArray orderTop = order.get(NDArrayIndex.interval(0,maxInd));
-    INDArray scores3 = thresholdedScrores.get(orderTop);
-    INDArray boxes3 = thresholdedBoxes.get(orderTop);
-    INDArray landnms3 = thresholdedLandnms.get(orderTop);
+//     INDArray order = Nd4j.reverse(Nd4j.createFromArray(ArrayUtils.argsort(thresholdedScrores.toFloatVector())));
+//     int maxInd = 750;
+//     if (order.shape()[0] < maxInd){
+//         maxInd = (int) order.shape()[0];
+//     }
+//     INDArray orderTop = order.get(NDArrayIndex.interval(0,maxInd));
+//     INDArray scores3 = thresholdedScrores.get(orderTop);
+//     INDArray boxes3 = thresholdedBoxes.get(orderTop);
+//     INDArray landnms3 = thresholdedLandnms.get(orderTop);
+
 
     // NMS
     double thresh = 0.4;
     int[] thresholdedScroresUnsqueezedShape = {(int) thresholdedScrores.shape()[0], 1};
     INDArray dets = Nd4j.hstack(thresholdedBoxes, thresholdedScrores.reshape(thresholdedScroresUnsqueezedShape));
-    int keep = Utils.cpu_nms(dets, thresh);
+    INDArray keep = Utils.cpu_nms(dets, thresh);
 
-//     System.out.println(dets);
-//     System.out.println(Arrays.toString(dets.shape()));
+    INDArray dets2 = dets.getRow(keep.getInt(0));
+
+    for (int i=1; i<keep.shape()[0]; i++) {
+        long[] shapes = {1, dets.getRow(keep.getInt(i)).shape()[0]};
+        dets2 = Nd4j.vstack(dets2,dets.getRow(keep.getInt(i)).reshape(shapes));
+    }
+    landnms = thresholdedLandnms.get(keep);
+
+//     # keep top-K faster NMS
+//     dets = dets[:args.keep_top_k, :]
+//     landms = landms[:args.keep_top_k, :]
+
+    System.out.println(Arrays.toString(keep.shape()));
+    System.out.println(Arrays.toString(dets2.shape()));
+    System.out.println(Arrays.toString(landnms.shape()));
+    dets = Nd4j.hstack(dets2, landnms);
 
     System.exit(0);
    }
