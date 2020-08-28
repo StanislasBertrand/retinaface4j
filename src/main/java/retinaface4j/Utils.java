@@ -24,6 +24,14 @@ public final class Utils {
         throw new UnsupportedOperationException();
     }
 
+    public static INDArray substractMean(INDArray img, float[] pixelMeans){
+        INDArray rMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[0]);
+        INDArray gMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[1]);
+        INDArray bMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[2]);
+        INDArray pixelMean = Nd4j.concat(1, rMean, gMean, bMean);
+        return img.sub(pixelMean);
+    }
+
     //public static methods here
     public static INDArray decode(float[] loc, float[] priors, long[] locShape){
         long[] locShapeSqueezed = {locShape[1], locShape[2]};

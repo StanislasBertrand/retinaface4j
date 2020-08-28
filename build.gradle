@@ -16,6 +16,8 @@ repositories {
 dependencies {
     if (USE_NIGHTLY) {
         implementation 'org.pytorch:pytorch_java_only:1.5.0-SNAPSHOT'
+        implementation 'org.datavec:datavec-api:1.0.0-beta7'
+        implementation 'org.datavec:datavec-data-image:1.0.0-beta7'
         implementation 'org.nd4j:nd4j-api:1.0.0-beta7'
         implementation 'org.nd4j:nd4j-native:1.0.0-beta7'
         implementation 'org.nd4j:nd4j-native-platform:1.0.0-beta7'
@@ -23,6 +25,8 @@ dependencies {
         implementation 'org.slf4j:slf4j-api:1.7.5'
         implementation 'org.slf4j:slf4j-log4j12:1.7.5'
     } else {
+        implementation 'org.datavec:datavec-api:1.0.0-beta7'
+        implementation 'org.datavec:datavec-data-image:1.0.0-beta7'
         implementation 'org.pytorch:pytorch_java_only:1.5.0'
         implementation 'org.nd4j:nd4j-api:1.0.0-beta7'
         implementation 'org.nd4j:nd4j-native:1.0.0-beta7'
