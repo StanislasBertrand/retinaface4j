@@ -1,6 +1,7 @@
 package retinaface4j;
 
 import java.util.*;
+import com.google.common.primitives.Ints;
 
 import org.pytorch.IValue;
 import org.pytorch.Module;
@@ -20,11 +21,13 @@ import java.util.Random;
 public final class Utils {
 
     // Private constructor to prevent instantiation
-    private Utils() {
+    private Utils()
+    {
         throw new UnsupportedOperationException();
     }
 
-    public static INDArray substractMean(INDArray img, float[] pixelMeans){
+    public static INDArray substractMean(INDArray img, float[] pixelMeans)
+    {
         INDArray rMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[0]);
         INDArray gMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[1]);
         INDArray bMean = Nd4j.ones(1, 1, img.shape()[2], img.shape()[3]).mul(pixelMeans[2]);
@@ -32,10 +35,9 @@ public final class Utils {
         return img.sub(pixelMean);
     }
 
-    //public static methods here
-    public static INDArray decode(float[] loc, float[] priors, long[] locShape){
+    public static INDArray decode(float[] loc, float[] priors, long[] locShape)
+    {
         long[] locShapeSqueezed = {locShape[1], locShape[2]};
-        long[] locShapeSqueezedSliced = {locShape[1], locShape[2]/2};
 
         INDArray nd4jLoc = Nd4j.createFromArray(loc).reshape(locShapeSqueezed);
         INDArray nd4jPriors = Nd4j.createFromArray(priors).reshape(locShapeSqueezed);
@@ -59,7 +61,6 @@ public final class Utils {
     public static INDArray decode_landm(float[] landnms, float[] priors, long[] landnmsShape) {
         long[] landnmshapeSqueezed = {landnmsShape[1], landnmsShape[2]};
         long[] priorsShapeSqueezed = {landnmsShape[1], 4};
-        long[] landnmsShapeSqueezedSliced = {landnmsShape[1], landnmsShape[2]/2};
 
         INDArray nd4jlandnms = Nd4j.createFromArray(landnms).reshape(landnmshapeSqueezed);
         INDArray nd4jPriors = Nd4j.createFromArray(priors).reshape(priorsShapeSqueezed);
@@ -85,7 +86,8 @@ public final class Utils {
     }
 
 
-    public static INDArray cpu_nms(INDArray dets, double thresh) {
+    public static INDArray cpu_nms(INDArray dets, double thresh)
+    {
         INDArray x1 = dets.getColumn(0);
         INDArray y1 = dets.getColumn(1);
         INDArray x2 = dets.getColumn(2);
@@ -98,7 +100,8 @@ public final class Utils {
         int i = 0;
         boolean keepon = true;
         List<Integer> keep = new ArrayList<Integer>();
-        while (keepon){
+        while (keepon)
+        {
             i = order.getInt(0);
             keep.add(i);
             INDArray x1OrderInd = x1.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
@@ -110,7 +113,6 @@ public final class Utils {
             INDArray x2OrderInd = x2.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
             INDArray xx2 = Transforms.min(x2OrderInd,
                                           Nd4j.ones(x2OrderInd.shape()).mul(x2.getDouble(i)));
-
             INDArray y2OrderInd = y2.get(order.get(NDArrayIndex.interval(1, order.shape()[0])));
             INDArray yy2 = Transforms.min(y2OrderInd,
                                           Nd4j.ones(y2OrderInd.shape()).mul(y2.getDouble(i)));
@@ -122,8 +124,10 @@ public final class Utils {
             INDArray inter = w.mul(h);
             INDArray over = inter.div(areas.get(order.get(NDArrayIndex.interval(1, order.shape()[0]))).sub(inter).add(areas.getDouble(i)));
             List<Integer> indices = new ArrayList<Integer>();
-            for (int j =0; j<over.shape()[0]; j++){
-                if (over.getDouble(j)<=thresh){
+            for (int j =0; j<over.shape()[0]; j++)
+            {
+                if (over.getDouble(j)<=thresh)
+                {
                     indices.add(j);
                 }
             }
@@ -134,24 +138,22 @@ public final class Utils {
                 indicesArr[j] = indices.get(j).intValue();
             }
             INDArray nd4jInds = Nd4j.createFromArray(indicesArr);
-            if (nd4jInds.isEmpty()) {
-            keepon = false;
-            continue;
+            if (nd4jInds.isEmpty())
+            {
+                keepon = false;
+                continue;
             }
 
             order = order.get(nd4jInds.add(1));
-            if (order.isEmpty()) {
-            keepon = false;
+            if (order.isEmpty())
+            {
+                keepon = false;
             }
-
-        }
-        int[] keepArr = new int[keep.size()];
-        for (int j=0; j < keepArr.length; j++)
-        {
-            keepArr[j] = keep.get(j).intValue();
         }
 
-        INDArray nd4jKeepArr = Nd4j.createFromArray(keepArr);
-        return nd4jKeepArr;
+
+        INDArray keepArr = Nd4j.createFromArray(Ints.toArray(keep));
+
+        return keepArr;
     }
 }

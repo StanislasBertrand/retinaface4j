@@ -44,7 +44,8 @@ public class App {
             imgPath = args[1];
             outputPath = args[2];
         } catch (Exception e) {
-            System.out.println("error reading demo arguments");
+            System.out.println("[ERROR] could not read arguments");
+            System.out.println(e.getMessage());
         }
 
         // Load model
@@ -59,6 +60,7 @@ public class App {
             nd4jimg = loader.asMatrix(img);
         } catch (IOException e) {
             System.out.println("[ERROR] could not read image");
+            System.out.println(e.getMessage());
         }
 
         // predict
@@ -75,6 +77,7 @@ public class App {
             ImageIO.write(img, "png", new File(outputPath));
         } catch (Exception e) {
             System.out.println("[ERROR] Could not save image.");
+            System.out.println(e.getMessage());
         }
 
         System.exit(0);
