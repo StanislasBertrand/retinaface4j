@@ -38,7 +38,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.datavec.image.loader.NativeImageLoader;
 
-String modelPath = "./models/Retinaface_resnet_traced.pt;
+String modelPath = "./models/Retinaface_resnet_traced.pt";
 String imgPath = "./sample-images/WC_FR.jpeg";
 Double detThresh = 0.9;
 Double nmsThresh = 0.4;
