@@ -18,7 +18,6 @@ example output :
 *****
 <a name="Installation"></a>
 ## INSTALLATION
-TODO 
 * Download and unpack libtorch from the [pytorch home page](https://pytorch.org/).
 * Run ```` export LIBTORCH_HOME=/path/to/libtorch````.
 
