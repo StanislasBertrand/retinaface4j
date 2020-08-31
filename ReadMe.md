@@ -22,7 +22,7 @@ TODO
 
 <a name="Usage"></a>
 ## USAGE
-Download pretrained weights on Dropbox  
+Download pretrained weights on [Dropbox](https://www.dropbox.com/sh/ar7q20icorvpaxi/AADFuPlnQEe78nsnGA7wzwuoa?dl=0)  
 Run  :
 ```angular2
 ./gradlew run --args="./weights/Retinaface_resnet_traced.pt ./sample-images/WC_FR.jpeg output.png"
