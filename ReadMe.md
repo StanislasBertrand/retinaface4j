@@ -19,13 +19,16 @@ example output :
 <a name="Installation"></a>
 ## INSTALLATION
 TODO 
+* Download and unpack libtorch from the [pytorch home page](https://pytorch.org/).
+* Run ```` export LIBTORCH_HOME=/path/to/libtorch````.
 
 <a name="Usage"></a>
 ## USAGE
-Download pretrained weights on [Dropbox](https://www.dropbox.com/sh/ar7q20icorvpaxi/AADFuPlnQEe78nsnGA7wzwuoa?dl=0)  
+Download pretrained weights on [Dropbox](https://www.dropbox.com/sh/ar7q20icorvpaxi/AADFuPlnQEe78nsnGA7wzwuoa?dl=0)  , and save them in the ````src/main/resources/models/```` folder
+
 Run  :
 ```angular2
-./gradlew run --args="./weights/RetinaFace_resnet50_traced.pt ./sample-images/WC_FR.jpeg output.png"
+./gradlew run --args="./sample-images/WC_FR.jpeg output.png"
 ```
 Java usage :
 ```java

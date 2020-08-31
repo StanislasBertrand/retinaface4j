@@ -14,7 +14,10 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 
+import java.net.URL;
 import java.io.File;
+import java.nio.file.Files;
+import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.awt.image.BufferedImage;
@@ -31,8 +34,9 @@ public class Detector{
     private double detThresh;
     private Module model;
 
-    public Detector(String path, double detThresh, double nmsThresh){
-        Module model = Module.load(path);
+    public Detector(double detThresh, double nmsThresh){
+        String resource = Detector.class.getResource("/models/RetinaFace_resnet50_traced.pt").getPath();
+        Module model = Module.load(resource);
         this.setModel(model);
         this.setDetThresh(detThresh);
         this.setNmsThresh(nmsThresh);

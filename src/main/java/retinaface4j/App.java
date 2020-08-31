@@ -34,22 +34,20 @@ public class App {
     public static void main(String[] args) {
 
         // Load arguments
-        String modelPath = null;
         String imgPath = null;
         String outputPath = null;
         Double detThresh = 0.9;
         Double nmsThresh = 0.4;
         try {
-            modelPath = args[0];
-            imgPath = args[1];
-            outputPath = args[2];
+            imgPath = args[0];
+            outputPath = args[1];
         } catch (Exception e) {
             System.out.println("[ERROR] could not read arguments");
             System.out.println(e.getMessage());
         }
 
         // Load model
-        Detector detector = new Detector(modelPath, detThresh, nmsThresh);
+        Detector detector = new Detector(detThresh, nmsThresh);
 
         // Read image
         BufferedImage img = null;
