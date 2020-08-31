@@ -63,7 +63,7 @@ public class Detector{
         IValue[] output = result.toTuple();
         Tensor loc = output[0].toTensor();
         Tensor conf = output[1].toTensor();
-        Tensor landms = output[2].toTensor();
+        Tensor landmks = output[2].toTensor();
 
 
         // Post processing
@@ -79,11 +79,11 @@ public class Detector{
         long[] confShapeSqueezed = {confShape[1], confShape[2]};
         INDArray nd4jConf = Nd4j.createFromArray(conf.getDataAsFloatArray()).reshape(confShapeSqueezed);
         INDArray scores = nd4jConf.getColumn(1);
-        // landnms post proc
-        INDArray landnms = Utils.decode_landm(landms.getDataAsFloatArray(), priors.getDataAsFloatArray(), landms.shape());
+        // landmks post proc
+        INDArray nd4jLandmks = Utils.decode_landm(landmks.getDataAsFloatArray(), priors.getDataAsFloatArray(), landmks.shape());
         long[] scale1 = {inputImg.shape()[3], inputImg.shape()[2], inputImg.shape()[3], inputImg.shape()[2], inputImg.shape()[3], inputImg.shape()[2], inputImg.shape()[3], inputImg.shape()[2], inputImg.shape()[3], inputImg.shape()[2]};
         INDArray nd4jScale1 = Nd4j.createFromArray(scale1);
-        landnms = landnms.mul(nd4jScale1);
+        nd4jLandmks = nd4jLandmks.mul(nd4jScale1);
 
 
         // ignore low scores
@@ -101,7 +101,7 @@ public class Detector{
         INDArray nd4jInds = Nd4j.createFromArray(indicesArr);
         scores = scores.get(nd4jInds);
         boxes = boxes.get(nd4jInds);
-        landnms = landnms.get(nd4jInds);
+        nd4jLandmks = nd4jLandmks.get(nd4jInds);
 
 
         // NMS
@@ -114,8 +114,8 @@ public class Detector{
             long[] shapes = {1, dets.getRow(keep.getInt(i)).shape()[0]};
             dets2 = Nd4j.vstack(dets2,dets.getRow(keep.getInt(i)).reshape(shapes));
         }
-        landnms = landnms.get(keep);
-        dets = Nd4j.hstack(dets2, landnms);
+        nd4jLandmks = nd4jLandmks.get(keep);
+        dets = Nd4j.hstack(dets2, nd4jLandmks);
 
 
         return dets;

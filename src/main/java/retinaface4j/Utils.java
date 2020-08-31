@@ -58,27 +58,27 @@ public final class Utils {
         return boxes;
     }
 
-    public static INDArray decode_landm(float[] landnms, float[] priors, long[] landnmsShape) {
-        long[] landnmshapeSqueezed = {landnmsShape[1], landnmsShape[2]};
-        long[] priorsShapeSqueezed = {landnmsShape[1], 4};
+    public static INDArray decode_landm(float[] landmks, float[] priors, long[] landmksShape) {
+        long[] landmksshapeSqueezed = {landmksShape[1], landmksShape[2]};
+        long[] priorsShapeSqueezed = {landmksShape[1], 4};
 
-        INDArray nd4jlandnms = Nd4j.createFromArray(landnms).reshape(landnmshapeSqueezed);
+        INDArray nd4jlandmks = Nd4j.createFromArray(landmks).reshape(landmksshapeSqueezed);
         INDArray nd4jPriors = Nd4j.createFromArray(priors).reshape(priorsShapeSqueezed);
 
         INDArray priorsEnd = Nd4j.vstack(nd4jPriors.getColumn(2),nd4jPriors.getColumn(3)).transpose();
         INDArray priorsStart = Nd4j.vstack(nd4jPriors.getColumn(0),nd4jPriors.getColumn(1)).transpose();
 
-        INDArray landnms0 = Nd4j.vstack(nd4jlandnms.getColumn(0),nd4jlandnms.getColumn(1)).transpose();
-        INDArray landnms1 = Nd4j.vstack(nd4jlandnms.getColumn(2),nd4jlandnms.getColumn(3)).transpose();
-        INDArray landnms2 = Nd4j.vstack(nd4jlandnms.getColumn(4),nd4jlandnms.getColumn(5)).transpose();
-        INDArray landnms3 = Nd4j.vstack(nd4jlandnms.getColumn(6),nd4jlandnms.getColumn(7)).transpose();
-        INDArray landnms4 = Nd4j.vstack(nd4jlandnms.getColumn(8),nd4jlandnms.getColumn(9)).transpose();
+        INDArray landmks0 = Nd4j.vstack(nd4jlandmks.getColumn(0),nd4jlandmks.getColumn(1)).transpose();
+        INDArray landmks1 = Nd4j.vstack(nd4jlandmks.getColumn(2),nd4jlandmks.getColumn(3)).transpose();
+        INDArray landmks2 = Nd4j.vstack(nd4jlandmks.getColumn(4),nd4jlandmks.getColumn(5)).transpose();
+        INDArray landmks3 = Nd4j.vstack(nd4jlandmks.getColumn(6),nd4jlandmks.getColumn(7)).transpose();
+        INDArray landmks4 = Nd4j.vstack(nd4jlandmks.getColumn(8),nd4jlandmks.getColumn(9)).transpose();
 
-        INDArray stack0 = priorsStart.add(landnms0.mul(0.1).mul(priorsEnd));
-        INDArray stack1 = priorsStart.add(landnms1.mul(0.1).mul(priorsEnd));
-        INDArray stack2 = priorsStart.add(landnms2.mul(0.1).mul(priorsEnd));
-        INDArray stack3 = priorsStart.add(landnms3.mul(0.1).mul(priorsEnd));
-        INDArray stack4 = priorsStart.add(landnms4.mul(0.1).mul(priorsEnd));
+        INDArray stack0 = priorsStart.add(landmks0.mul(0.1).mul(priorsEnd));
+        INDArray stack1 = priorsStart.add(landmks1.mul(0.1).mul(priorsEnd));
+        INDArray stack2 = priorsStart.add(landmks2.mul(0.1).mul(priorsEnd));
+        INDArray stack3 = priorsStart.add(landmks3.mul(0.1).mul(priorsEnd));
+        INDArray stack4 = priorsStart.add(landmks4.mul(0.1).mul(priorsEnd));
 
         INDArray output = Nd4j.hstack(stack0,stack1,stack2,stack3,stack4);
 
