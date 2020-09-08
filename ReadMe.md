@@ -1,4 +1,4 @@
-# [WIP] retinaface4j
+# retinaface4j
 ## Because not all production environements can be in python
 RetinaFace (RetinaFace: Single-stage Dense Face Localisation in the Wild, published in 2019), in java.  
 This repo is an experiment attempting to answer the question : Is pytorch java + ND4J a viable option for deep learning on the JVM ?  
@@ -18,8 +18,8 @@ example output :
 *****
 <a name="Installation"></a>
 ## INSTALLATION
-* Download and unpack libtorch from the [pytorch home page](https://pytorch.org/).
-* Run ```` export LIBTORCH_HOME=/path/to/libtorch````.
+* Download and unpack libtorch from the [pytorch home page](https://pytorch.org/) (or 1.4 or greater). From the pytorch.org homepage under "Quick Start Locally", make sure "LibTorch" is the selected package.  
+* Run ```` export LIBTORCH_HOME=/path/to/libtorch````. The build.gradle file will use this to set java.library.path when running the application. If you are using PyTorch in your own environment, LIBTORCH_HOME is not necessary. Instead, you will need to set java.library.path to /path/to/libtorch/lib.  
 
 <a name="Usage"></a>
 ## USAGE
