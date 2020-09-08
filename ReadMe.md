@@ -64,7 +64,7 @@ INDArray dets = detector.predict(nd4jimg);
 This work is laergely based on :  
 The original implementation by the [insightface](https://github.com/deepinsight/insightface) team.  
 The [pyton pytorch implementation](https://github.com/biubug6/Pytorch_Retinaface).  
-[Pytorch's java-demo] example lib(https://github.com/pytorch/java-demo).  
+[Pytorch's java-demo](https://github.com/pytorch/java-demo)  example lib.  
 If you use this repo, please reference the original work :  
 
 ```  
